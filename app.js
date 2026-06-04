@@ -11,6 +11,7 @@ const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'),
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(devicePixelRatio);
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // Bintang-bintang background
 const starGeo = new THREE.BufferGeometry();
@@ -28,12 +29,33 @@ const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });
 const stars = new THREE.Points(starGeo, starMat);
 scene.add(stars);
 
+// Lantai untuk shadow
+const floorGeo = new THREE.PlaneGeometry(300, 300);
+const floorMat = new THREE.MeshStandardMaterial({ 
+  color: 0x000011, 
+  roughness: 1, 
+  metalness: 0 
+});
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -10;
+floor.receiveShadow = true;
+scene.add(floor);
+
 // Cahaya dari Matahari
-const sunLight = new THREE.PointLight(0xffffff, 3, 300);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+scene.add(ambientLight);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+dirLight.position.set(10, 20, 10);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+scene.add(dirLight);
+
+const sunLight = new THREE.PointLight(0xFFA500, 3, 300);
 sunLight.position.set(0, 0, 0);
 scene.add(sunLight);
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-scene.add(ambientLight);
 
 // Texture Loader
 const textureLoader = new THREE.TextureLoader();
